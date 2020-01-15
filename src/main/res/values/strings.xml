@@ -33,4 +33,15 @@
         <item>Accessories</item>
         <item>Stationries</item>
     </string-array>
+
+    <string-array name="Search">
+
+        <item>Furniture</item>
+        <item>Clothes</item>
+        <item>Food</item>
+        <item>Utensils</item>
+        <item>Accessories</item>
+        <item>Stationries</item>
+    </string-array>
+    <string name="title_activity_maps">Map</string>
 </resources>
