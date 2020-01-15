@@ -6,13 +6,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".Dashboard">
 
-        <ScrollView
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentLeft="true">
+    <ScrollView
+        android:layout_width="fill_parent"
+        android:layout_height="600dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true">
 
-        </ScrollView>
+
         <LinearLayout
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
@@ -252,14 +252,14 @@
                                                             android:id="@+id/home"
                                                             android:layout_width="50dp"
                                                             android:layout_height="50dp"
-                                                            android:background="@drawable/ic_home_black_24dp"
+                                                            android:background="@drawable/ic_location_on_black_24dp"
                                                             android:layout_centerInParent="true"
                                                             />
                                                         <TextView
                                                             android:layout_width="wrap_content"
                                                             android:layout_below="@+id/home"
                                                             android:layout_height="wrap_content"
-                                                            android:text="Home"
+                                                            android:text="Location"
                                                             android:textSize="16sp"
                                                             android:layout_centerInParent="true"
                                                             android:layout_marginBottom="10dp"
@@ -324,6 +324,7 @@
 
 
         </LinearLayout>
+    </ScrollView>
 
 </RelativeLayout>
 
