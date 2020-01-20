@@ -1,9 +1,12 @@
 package com.example.thiftmarts;
 
-import androidx.appcompat.app.AppCompatActivity;
-
+import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.VibrationEffect;
 import android.os.Vibrator;
+import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -12,83 +15,102 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AppCompatActivity;
+
+import com.example.thiftmarts.API.AppAPI;
+import com.example.thiftmarts.Model.LoginResponse;
+import com.example.thiftmarts.URL.url;
+import com.example.thiftmarts.User.SellProduct;
+
 import java.util.ArrayList;
 import java.util.List;
 
-import static android.widget.Toast.makeText;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 
-public class LoginActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
+public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
+
+    Button btnlogin, btnregis;
+    Vibrator vibrator;
     private EditText txtusername, txtpassword;
-
-    Spinner spinner;
-
-    Button btnlogin,btnregis;
-   Vibrator vibrator;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-    txtusername=findViewById(R.id.et_username);
-    txtpassword=findViewById(R.id.et_password);
+        txtusername = findViewById(R.id.et_username);
+        txtpassword = findViewById(R.id.et_password);
 
+        vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
 
+        btnregis = findViewById(R.id.btn_register);
+        btnregis.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
 
-        btnlogin=findViewById(R.id.btn_login);
+                if (v.getId() == R.id.btn_register) {
+
+                    Intent intent = new Intent(LoginActivity.this, SignUp.class);
+                    startActivity(intent);
+                }
+            }
+        });
+
+        AppAPI restAPI = url.getInstance().create(AppAPI.class);
+
+        btnlogin = findViewById(R.id.btn_login);
         btnlogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 String usernameinput = txtusername.getText().toString();
                 String passwordinput = txtpassword.getText().toString();
 
-                if (txtusername.getText().toString().equals("admin") &&
-                        txtpassword.getText().toString().equals("admin")) {
-                    //  Toast.makeText(getApplicationContext(), "Hello admin!",Toast.LENGTH_SHORT).show();
+                if (TextUtils.isEmpty(usernameinput)) {
+                    Toast.makeText(LoginActivity.this, "Email and password is empty", Toast.LENGTH_SHORT).show();
 
-                    Toast.makeText(LoginActivity.this, "Hello Admin!", Toast.LENGTH_SHORT).show();
-                } else {
-                    Toast.makeText(getApplicationContext(), "Invalid name or password",
-                            Toast.LENGTH_SHORT).show();
+                    return;
                 }
-            }
+                if (TextUtils.isEmpty(passwordinput)) {
+                    Toast.makeText(LoginActivity.this, "Password is empty", Toast.LENGTH_SHORT).show();
 
+                    return;
+                }
 
-            });
-
-                spinner = (Spinner) findViewById(R.id.usertype);
-
-                List<String> list = new ArrayList<String>();
-                list.add("User");
-                list.add("Admin");
-
-                ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item,list);
-                arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                spinner.setAdapter(arrayAdapter);
-                spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                restAPI.checkUser(usernameinput, passwordinput).enqueue(new Callback<LoginResponse>() {
                     @Override
-                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                        spinner.setSelection(position);
+                    public void onResponse(Call<LoginResponse> call, Response<LoginResponse> response) {
+                        if (response.isSuccessful()) {
+                            if (Build.VERSION.SDK_INT >= 26) {
+                                vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
+                            } else {
+                                vibrator.vibrate(200);
+                            }
+                            startActivity(new Intent(LoginActivity.this, Dashboard.class));
+                        } else {
+                            Toast.makeText(LoginActivity.this, "Username or password is incorrect", Toast.LENGTH_SHORT).show();
+                        }
+
                     }
 
                     @Override
-                    public void onNothingSelected(AdapterView<?> parent) {
+                    public void onFailure(Call<LoginResponse> call, Throwable t) {
+                        Toast.makeText(LoginActivity.this, "Username or password is incorrect", Toast.LENGTH_SHORT).show();
 
                     }
                 });
-
             }
 
 
-    @Override
-    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-        spinner.setSelection(position);
+        });
+
+
     }
 
     @Override
-    public void onNothingSelected(AdapterView<?> parent) {
+    public void onClick(View v) {
 
     }
 }
