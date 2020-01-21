@@ -7,15 +7,15 @@ package com.example.thiftmarts.Model;
   private String email;
   private String gender;
   private String password;
+  private String Usertype;
 
-  public User(String name, String address, String email, String gender, String password) {
+  public User(String name, String address, String email, String gender, String password, String Usertype) {
    this.name = name;
    this.address = address;
    this.email = email;
    this.gender = gender;
    this.password = password;
-
-
+   this.Usertype = Usertype;
   }
 
   public String getName() {
@@ -36,6 +36,10 @@ package com.example.thiftmarts.Model;
 
   public String getPassword() {
    return password;
+  }
+
+  public String getUsertype() {
+   return Usertype;
   }
  }
 
