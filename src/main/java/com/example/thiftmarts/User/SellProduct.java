@@ -1,13 +1,11 @@
 package com.example.thiftmarts.User;
 
-import android.app.Activity;
+import android.Manifest;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.media.Image;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.provider.MediaStore;
@@ -18,19 +16,18 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
-import android.widget.Switch;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 import androidx.loader.content.CursorLoader;
 
-import com.example.thiftmarts.API.AppAPI;
 import com.example.thiftmarts.Dashboard;
-import com.example.thiftmarts.MainActivity;
-import com.example.thiftmarts.Model.ImageResponse;
+import com.example.thiftmarts.Model.Image;
+import com.example.thiftmarts.Model.Product;
 import com.example.thiftmarts.R;
-import com.example.thiftmarts.RecyclerProducts;
 import com.example.thiftmarts.URL.url;
 
 import java.io.File;
@@ -48,36 +45,31 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.http.Url;
 
-import static android.widget.Toast.*;
+public class SellProduct extends AppCompatActivity {
+    Context context;
 
-public class SellProduct extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
-    private EditText txtname, txtdesc, txtcategory, txtprice;
-    String imagePath;
-    String imageName;
-
-    private static final int PICK_IMAGE = 1;
-    private static final int REQUEST_READ_GALLERY = 1;
-    // private static final int RESULT_CODE= 1;
-    private static final int MY_REQUEST_GALLERY = 1;
-
-    private Button btnadd, btnback, btnchoseimage;
-    Spinner spinner;
+    private  static final  int PICK_IMAGE=1;
+    private  static final  int REQUEST_CODE=1;
+    private EditText text_productName, text_productCategory, text_productPrice,text_productDescription;
+    private Button buttonSellProduct, btnback, btnphotoadd;
+     Spinner spinner;
     private ImageView imgProfile;
+    String imagePath = "";
+    String imageName = "";
+    String Category = "";
 
 
-    protected void onCreate(Bundle savedInstanceState) {
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sell);
-
-
-        txtname = findViewById(R.id.product_name);
-        txtdesc = findViewById(R.id.product_description);
-        txtprice = findViewById(R.id.product_price);
-        btnadd = findViewById(R.id.add_new_product);
-
+        text_productName = findViewById(R.id.product_name);
+        text_productDescription = findViewById(R.id.product_description);
+        text_productPrice = findViewById(R.id.product_price);
+        buttonSellProduct = findViewById(R.id.button_Sell);
         btnback = findViewById(R.id.btnback);
-        btnchoseimage = findViewById(R.id.btnchoseimages);
-
+        btnphotoadd = findViewById(R.id.add_image);
+        context = this;
         btnback.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -85,74 +77,37 @@ public class SellProduct extends AppCompatActivity implements AdapterView.OnItem
                 startActivity(intent);
                 finish();
             }
+
+
         });
 
-        imgProfile = findViewById(R.id.select_product_image);
-        btnchoseimage = findViewById(R.id.btnchoseimages);
-        btnchoseimage.setOnClickListener(new View.OnClickListener() {
+        btnphotoadd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Save();
-
+                Toast.makeText(context,"image",Toast.LENGTH_SHORT).show();
+                CheckPermission();
+                openImage();
             }
         });
-        imgProfile.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                BrowseImage();
-            }
 
-            private void BrowseImage() {
-                Intent intent = new Intent(Intent.ACTION_PICK);
-                intent.setType("image/*");
-                startActivityForResult(intent, 0);
-            }
+        spinner = findViewById(R.id.product_category);
 
+        List<String> list = new ArrayList<String>();
+        list.add("Utensils");
+        list.add("Stationries");
+        list.add("Clothes");
+        list.add("Furniture");
+        list.add("Electronics");
 
-        });
-
-
-
-    //  btnchoseimage.setOnClickListener(new View.OnClickListener() {
-    //   @Override
-    //  public void onClick(View v) {
-    // Intent intent=new Intent(Intent.ACTION_PICK);
-    // intent.setType("images/*");
-    // String[]mimeTypes={"images/jpeg","images/png"};
-    // Intent pickIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-
-    //intent.setType("images/*");
-    // Intent chooserIntent=Intent.createChooser(getIntent(),"Select Image");
-    // chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS,new Intent[]{pickIntent});
-
-    //   intent.setAction(Intent.ACTION_GET_CONTENT);
-    //  startActivityForResult(intent,PICK_IMAGE);
-    // }
-
-
-    // });
-
-
-
-
-        spinner = (Spinner) findViewById(R.id.product_category);
-
-        List<String> category = new ArrayList<String>();
-        category.add("Furniture");
-        category.add("Clothes");
-        category.add("Accessories");
-        category.add("Utensils");
-        category.add("Food");
-        category.add("Stationries");
-
-        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, category);
+        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, list);
         arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(arrayAdapter);
+        spinner.setSelection(1);
+        Category = list.get(1);
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                spinner.setSelection(position);
-                makeText(SellProduct.this, "Select Your Category", LENGTH_SHORT).show();
+                Category = list.get(position);
             }
 
             @Override
@@ -161,38 +116,104 @@ public class SellProduct extends AppCompatActivity implements AdapterView.OnItem
             }
         });
 
+        buttonSellProduct.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                SaveImageOnly();
+                Call<Product> AddProduct =  url.getApi().AddProdut(
+                        text_productName.getText().toString(),
+                        Category,
+                        text_productPrice.getText().toString(),
+                        text_productDescription.getText().toString(),
+                        imageName
+                );
+                AddProduct.enqueue(new Callback<Product>() {
+                    @Override
+                    public void onResponse(Call<Product> call, Response<Product> response) {
+                        if(response.code() == 201){
+                            Toast.makeText(context,"Product Added Successfully",Toast.LENGTH_SHORT).show();
+                        }else {
+                            Toast.makeText(context,"Failed to Add Product",Toast.LENGTH_SHORT).show();
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<Product> call, Throwable t) {
+                        Toast.makeText(context,"Error " + t.getLocalizedMessage(),Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+        });
+
+
+        imgProfile = (ImageView) findViewById(R.id.select_product_image);
+        btnphotoadd = findViewById(R.id.add_image);
+        btnphotoadd.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                intent.setType("image/*");
+                String[] mimiTypes = {"image/jpeg", "image/png"};
+                intent.putExtra(Intent.EXTRA_MIME_TYPES, mimiTypes);
+                startActivityForResult(intent.createChooser(intent, "Pick An Image"),0);
+            }
+        });
     }
-
     @Override
-    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-
-    }
-
-    @Override
-    public void onNothingSelected(AdapterView<?> parent) {
-
-    }
-
-
-    @Override
-        protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-
-
-            if (resultCode==RESULT_OK){
-                if (data==null){
-                    Toast.makeText(this, "Please select an image", Toast.LENGTH_SHORT).show();
-                }
+        if (resultCode == RESULT_OK) {
+            if (data == null) {
+                Toast.makeText(this, "Please select an image ", Toast.LENGTH_SHORT).show();
             }
-            Uri uri=data.getData();
-            imagePath=getRealPathFromUri(uri);
-            previewImage(imagePath);
         }
+        Uri uri = data.getData();
+        imagePath = getRealPathFromUri(uri);
+//        previewImage(imagePath);
+    }
+    private void StrictMode() {
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+        StrictMode.setThreadPolicy(policy);
+    }
+
+    private void openImage() {
+        Intent intent = new Intent();
+        intent.setType("image/*");
+        intent.setAction(Intent.ACTION_GET_CONTENT);
+        startActivityForResult(intent, 1);
+    }
+
+        private void CheckPermission() {
+        if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                Manifest.permission.READ_EXTERNAL_STORAGE)) {
+
+            new AlertDialog.Builder(this)
+                    .setTitle("Permission needed")
+                    .setMessage("This permission is needed because of this and that")
+                    .setPositiveButton("ok", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            ActivityCompat.requestPermissions(SellProduct.this,
+                                    new String[] {Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
+                        }
+                    })
+                    .setNegativeButton("cancel", new DialogInterface.OnClickListener() {
+                        @Override
+
+
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    })
+                    .create().show();
+        }
+    }
+
     private String getRealPathFromUri(Uri uri) {
-        String[] projection ={MediaStore.Images.Media.DATA};
-        CursorLoader loader = new CursorLoader(getApplicationContext(), uri, projection,
-                null, null, null);
+        String[] projection = {MediaStore.Images.Media.DATA};
+        CursorLoader loader = new CursorLoader(SellProduct.this, uri, projection, null,
+                null, null);
         Cursor cursor = loader.loadInBackground();
         int colIndex = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
         cursor.moveToFirst();
@@ -200,98 +221,40 @@ public class SellProduct extends AppCompatActivity implements AdapterView.OnItem
         cursor.close();
         return result;
     }
-    private void previewImage(String imagePath) {
-        File imgFile = new File(imagePath);
-        if (imgFile.exists()){
-            Bitmap myBitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
-            imgProfile.setImageBitmap(myBitmap);
-        }
-    }
-    private void StrictMode(){
-        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-        StrictMode.setThreadPolicy(policy);
-    }
+
+//    private String getRealPathFromUri(Uri uri) {
+//        String[] projection = {MediaStore.Images.Media.DATA};
+//        CursorLoader loader = new CursorLoader(SellProduct.this,
+//                uri, projection, null, null, null);
+//        Cursor cursor = loader.loadInBackground();
+//        int colIndex = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+//        cursor.moveToFirst();
+//        String result = cursor.getString(colIndex);
+//        cursor.close();
+//        return result;
+//    }
 
     private void SaveImageOnly() {
-
 
         File file = new File(imagePath);
 
         RequestBody requestBody = RequestBody.create(MediaType.parse("multipart/form-data"), file);
         MultipartBody.Part body = MultipartBody.Part.createFormData("imageFile", file.getName(), requestBody);
-        AppAPI productapi = url.getInstance().create(AppAPI.class);
-        Call<ImageResponse> responseBodyCall = AppAPI.upload(url.token, body);
 
-        StrictMode();
+        Call<Image> PostImage = url.getApi().UploadImage(body);
+
         try {
-            Response<ImageResponse> imageResponseResponse = responseBodyCall.execute();
+            StrictMode();
+            Response<Image> imageResponseResponse = PostImage.execute();
+            // After saving an image, retrieve the current name of the image
             imageName = imageResponseResponse.body().getFilename();
-            Toast.makeText(this, imageName, Toast.LENGTH_SHORT).show();
         } catch (IOException e) {
             Toast.makeText(this, "Error", Toast.LENGTH_SHORT).show();
             e.printStackTrace();
         }
     }
-        private void Save() {
-            SaveImageOnly();
-            String name = txtname.getText().toString();
-            String price = txtprice.getText().toString();
-            String description = txtdesc.getText().toString();
-            String category=txtcategory.getText().toString();
+}
 
-
-
-            AppAPI appAPI = url.getInstance().create(AppAPI.class);
-            Call<Void> heroesCall = appAPI.addproduct(url.token,name,category,price,description,imageName);
-            heroesCall.enqueue(new Callback<Void>() {
-                @Override
-                public void onResponse(Call<Void> call, Response<Void> response) {
-                    if (!response.isSuccessful()) {
-                        Toast.makeText(SellProduct.this, "code " + response.code(), Toast.LENGTH_SHORT).show();
-                        return;
-                    }
-                    Toast.makeText(SellProduct.this, "Successfully Added", Toast.LENGTH_SHORT).show();
-                    Intent intent = new Intent(SellProduct.this, RecyclerProducts.class);
-                    startActivity(intent);
-                    finish();
-                }
-
-                @Override
-                public void onFailure(Call<Void> call, Throwable t) {
-                    Toast.makeText(SellProduct.this, "Error " + t.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
-                }
-            });
-
-
-        }
-    }
-
-
-
-        // if(reprivate String getRealPathFromUri(Uri uri) {
-    //     String[] projection ={MediaStore.Images.Media.DATA};
-    //        CursorLoader loader = new CursorLoader(getApplicationContext(), uri, projection,
-    //                null, null, null);
-    //        Cursor cursor = loader.loadInBackground();
-    //        int colIndex = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-    //        cursor.moveToFirst();
-    //        String result = cursor.getString(colIndex);
-    //        cursor.close();
-    //        return result;
-    //    requestCode== Activity.RESULT_OK)
-          //   switch(requestCode) {
-           // case MY_REQUEST_GALLERY:
-            //    Uri selectedImage= data.getData();
-             //   String[] filePathColumn={MediaStore.Images.Media.DATA};
-              //  Cursor cursor=getContentResolver().query(selectedImage,filePathColumn,null,null,null);
-          //      cursor.moveToFirst();
-              //  int columnIndex=cursor.getColumnIndex(filePathColumn[0]);
-               // String imgDecodableString=cursor.getString(columnIndex);
-               // cursor.close();
-              //  imgProfile.setImageBitmap(BitmapFactory.decodeFile(imgDecodableString));
-               // break;
-
-      //  }
 
 
 
