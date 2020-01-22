@@ -1,20 +1,25 @@
 package com.example.thiftmarts.Model;
 
 public class LoginResponse {
-        private boolean success;
-        private String status;
+
         private String token;
+        private String userType;
 
-        public boolean getSuccess() {
-            return success;
-        }
-
-        public String getStatus() {
-            return status;
-        }
-        public String getToken() {
-            return token;
-        }
+    public String getToken() {
+        return token;
     }
+
+    public void setToken(String token) {
+        this.token = token;
+    }
+
+    public String getUserType() {
+        return userType;
+    }
+
+    public void setUserType(String userType) {
+        this.userType = userType;
+    }
+}
 
 

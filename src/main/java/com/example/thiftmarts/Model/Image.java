@@ -1,11 +1,13 @@
 package com.example.thiftmarts.Model;
 
-public class ImageResponse {
-    private String filename;
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
 
-    public ImageResponse(String filename) {
-        this.filename = filename;
-    }
+public class Image {
+
+    @SerializedName("filename")
+    @Expose
+    private String filename;
 
     public String getFilename() {
         return filename;
@@ -14,4 +16,5 @@ public class ImageResponse {
     public void setFilename(String filename) {
         this.filename = filename;
     }
+
 }
