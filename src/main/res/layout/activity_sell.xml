@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/buy"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".User.SellProduct">
+
+
+    <ImageView
+        android:id="@+id/select_product_image"
+        android:layout_width="399dp"
+        android:layout_height="269dp"
+        android:layout_marginTop="10dp"
+        android:cropToPadding="false"
+        android:scaleType="centerCrop"
+        android:src="@drawable/blur" />
+
+    <Button
+        android:id="@+id/btnback"
+        android:layout_width="100dp"
+        android:layout_height="90dp"
+        android:text="back" />
+
+
+    <ImageView
+        android:id="@+id/imgPhoto"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:layout_gravity="center"
+        android:layout_marginLeft="130dp"
+        android:layout_marginTop="50dp"
+        android:background="@drawable/cover"
+        android:scaleType="centerInside" />
+
+    <EditText
+        android:id="@+id/product_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/select_product_image"
+        android:layout_marginLeft="45dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginRight="45dp"
+        android:hint="Product Name"
+        android:inputType="textMultiLine"
+        android:padding="20dp"
+
+        />
+
+
+    <Spinner
+        android:id="@+id/product_category"
+        android:layout_width="322dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/select_product_image"
+        android:layout_marginLeft="45dp"
+        android:layout_marginTop="73dp"
+        android:layout_marginRight="45dp"
+        android:hint="Product Category"
+        android:inputType="textMultiLine"
+        android:padding="20dp"
+
+        />
+
+    <EditText
+        android:id="@+id/product_description"
+        android:layout_width="313dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/product_name"
+        android:layout_marginLeft="45dp"
+        android:layout_marginTop="39dp"
+        android:layout_marginRight="45dp"
+        android:hint="Product Description..."
+        android:inputType="textMultiLine"
+        android:padding="20dp"
+
+        />
+
+    <EditText
+        android:id="@+id/product_price"
+        android:layout_width="309dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/product_description"
+        android:layout_marginLeft="45dp"
+        android:layout_marginTop="22dp"
+        android:layout_marginRight="45dp"
+        android:hint="Product Price..."
+        android:inputType="textMultiLine"
+        android:padding="20dp" />
+    <Button
+        android:id="@+id/add_image"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/product_price"
+        android:layout_marginLeft="45dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginRight="45dp"
+        android:padding="17dp"
+        android:text="Add Image Photo"
+        android:textAllCaps="false"
+        android:textColor="@android:color/black"
+        android:textSize="18sp"
+
+        />
+
+
+    <Button
+        android:id="@+id/btnchoseimages"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/add_image"
+        android:layout_marginLeft="45dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginRight="45dp"
+        android:padding="17dp"
+        android:text="Sell The Product"
+        android:textAllCaps="false"
+        android:textColor="@android:color/black"
+        android:textSize="18sp"
+
+        />
+
+
+</RelativeLayout>
